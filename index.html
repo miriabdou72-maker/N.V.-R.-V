@@ -206,7 +206,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const SUPABASE_URL = 'https://uyvpfojfgpuxuhjiffut.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_OrKJXYiYr7-2R3oC9_jgvg_srqlLgCH'; 
-const BUCKET = 'media'; // تم ضبط اسم الـ Bucket ليتوافق مع الإعدادات السابقة
+const BUCKET = 'media';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
@@ -259,9 +259,6 @@ async function loadGallery() {
 
         if (!data || data.length === 0) return;
 
-        let hasVideos = false;
-        let hasImages = false;
-
         for (const item of data) {
             const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(item.file_path);
             const fileUrl = publicURLData.publicUrl;
@@ -271,12 +268,10 @@ async function loadGallery() {
 
             let mediaEl;
             if (item.media_type === 'video') {
-                hasVideos = true;
                 mediaEl = document.createElement('video');
                 mediaEl.controls = true;
                 mediaEl.src = fileUrl;
             } else {
-                hasImages = true;
                 mediaEl = document.createElement('img');
                 mediaEl.src = fileUrl;
                 mediaEl.alt = item.title;
@@ -338,8 +333,8 @@ function handlePublish(config) {
 
         try {
             const fileExt = file.name.split('.').pop() || 'jpg';
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `${config.type}s/${fileName}`;
+            // تصحيح مسار الحفظ ليكون اسم الملف مباشرة دون مجلدات غير موجودة
+            const filePath = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
             const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
             if (uploadError) throw uploadError;
