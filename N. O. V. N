@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b18">
+<title>تحيا الجزائر | ذاكرة الثورة</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&family=Reem+Kufi:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{--green:#123b2d;--green2:#1b513b;--red:#a92732;--gold:#b49a65;--dark:#101b18;--cream:#e9e1cf;--muted:#aaa895}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--dark);color:var(--cream);font-family:Tajawal,sans-serif}
+button,input{font-family:inherit}
+.intro{position:fixed;inset:0;z-index:1000;background:#101b18;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:hideIntro 1s ease 2.5s forwards}
+.flag{width:min(250px,70vw);aspect-ratio:3/2;border:2px solid var(--gold)}
+.flag svg{width:100%;height:100%}
+.intro h2{font:700 25px Amiri;text-align:center}
+.intro p{color:var(--gold)}
+@keyframes hideIntro{to{opacity:0;visibility:hidden}}
+.hero{min-height:530px;display:flex;align-items:center;justify-content:center;text-align:center;padding:70px 18px;background:linear-gradient(110deg,#101b18,#123b2d,#101b18);border-bottom:4px solid var(--gold)}
+.official{font:700 clamp(23px,4vw,38px) Amiri}
+.school{font-size:25px;color:var(--gold);font-weight:bold}
+.divider{width:120px;height:2px;background:var(--gold);margin:25px auto}
+.hero-title{font:900 clamp(42px,8vw,82px) "Reem Kufi";margin:10px}
+.hero-subtitle{font:24px Amiri;color:var(--muted)}
+.viva{font:900 clamp(35px,6vw,55px) "Reem Kufi";color:var(--gold);margin-top:25px}
+.hero-date{margin-top:15px;color:var(--muted)}
+nav{position:sticky;top:0;z-index:50;display:flex;justify-content:center;flex-wrap:wrap;gap:9px;padding:14px;background:#101b18f5;border-bottom:1px solid #b49a6540}
+nav a{color:var(--cream);text-decoration:none;padding:10px 17px;border:1px solid #b49a6550;border-radius:4px;font-weight:bold}
+nav a:hover{background:var(--green)}
+.section{max-width:1150px;margin:auto;padding:60px 20px}
+.heading{text-align:center;margin-bottom:35px}
+.heading h2{font:700 clamp(28px,5vw,42px) Amiri;color:var(--gold);margin:0}
+.heading p{color:var(--muted)}
+.history{padding:28px;line-height:2.1;font-size:18px;text-align:center;background:#192722;border-right:5px solid var(--gold);border-radius:5px}
+.upload-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.upload-card{padding:27px;background:linear-gradient(145deg,#1c2b24,#15211c);border:1px solid #b49a6550;border-radius:7px}
+.upload-card h3{font:700 27px Amiri;color:var(--gold);margin:5px 0}
+.upload-card p{color:var(--muted);line-height:1.8}
+.upload-icon{font-size:42px}
+.field{margin:19px 0}
+.field label{display:block;margin-bottom:9px;font-weight:bold}
+.field input{width:100%;padding:14px;border-radius:4px;border:1px solid #71684f;background:#101b18;color:white}
+.file-input{border:1px dashed var(--gold)!important;padding:15px!important}
+.file-info{margin-top:12px;padding:12px;background:#101b18;border:1px solid #b49a6540;border-radius:4px;color:#d7c49a;overflow-wrap:anywhere;line-height:1.7}
+.publish{width:100%;padding:15px;background:var(--green2);border:1px solid var(--gold);color:white;font-size:18px;font-weight:bold;border-radius:4px;cursor:pointer}
+.publish:disabled{opacity:.5;cursor:not-allowed}
+.status{display:none;margin-top:14px;padding:13px;line-height:1.7;overflow-wrap:anywhere}
+.status.success{display:block;background:#183b2b;color:#b8e3c8}
+.status.error{display:block;background:#51252a;color:#ffd0d0}
+.status.info{display:block;background:#263b42;color:#d4eaf1}
+.progress{display:none;height:8px;background:#333;margin-top:15px;border-radius:20px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:var(--gold);transition:width .3s}
+.gallery-section{background:#0d1613;border-block:1px solid #b49a6530}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.card{background:#1a2821;border:1px solid #b49a6540;border-radius:6px;overflow:hidden}
+.card img,.card video{display:block;width:100%;max-height:450px;object-fit:contain;background:#000}
+.card img{cursor:zoom-in}
+.card-info{padding:15px}
+.card-info h3{color:var(--gold);overflow-wrap:anywhere;margin:0 0 8px 0}
+.card-info small{color:var(--muted)}
+.empty{grid-column:1/-1;text-align:center;padding:30px;color:var(--muted)}
+.viewer{display:none;position:fixed;inset:0;z-index:500;background:#000e;align-items:center;justify-content:center;padding:20px}
+.viewer img{max-width:95%;max-height:90vh}
+.close-viewer{position:absolute;top:15px;left:15px;padding:12px;background:var(--red);color:white;border:0;cursor:pointer}
+footer{text-align:center;padding:45px 15px;border-top:3px solid var(--gold)}
+footer h2{font:900 36px "Reem Kufi";color:var(--gold)}
+footer p{color:var(--muted);line-height:2}
+@media(max-width:700px){.upload-grid{grid-template-columns:1fr}.section{padding:45px 15px}nav a{padding:9px 11px;font-size:14px}}
+</style>
+</head>
+<body>
+
+<div class="intro">
+<div class="flag">
+<svg viewBox="0 0 900 600">
+<rect width="450" height="600" fill="#006233"/>
+<rect x="450" width="450" height="600" fill="white"/>
+<circle cx="450" cy="300" r="150" fill="#d21034"/>
+<circle cx="490" cy="275" r="120" fill="white"/>
+<polygon points="490,195 510,255 575,255 522,293 542,355 490,317 438,355 458,293 405,255 470,255" fill="#d21034"/>
+</svg>
+</div>
+<h2>مرحباً بكم في ذاكرة الثورة الجزائرية</h2>
+<p>1 NOVEMBRE 1954</p>
+</div>
+
+<header class="hero" id="home">
+<div>
+<h2 class="official">الجمهورية الجزائرية الديمقراطية الشعبية</h2>
+<div class="school">ثانوية بن قاسم شاطو</div>
+<div class="divider"></div>
+<h1 class="hero-title">ذاكرة الثورة</h1>
+<div class="hero-subtitle">مجدٌ لا يُنسى... وتاريخٌ لا يموت</div>
+<div class="viva">تحيا الجزائر</div>
+<div class="hero-date">الذكرى الثانية والسبعون لاندلاع الثورة التحريرية</div>
+</div>
+</header>
+
+<nav>
+<a href="#home">الرئيسية</a>
+<a href="#about">عن الثورة</a>
+<a href="#upload">نشر المحتوى</a>
+<a href="#videos">الفيديوهات</a>
+<a href="#photos">الصور</a>
+</nav>
+
+<section class="section" id="about">
+<div class="heading">
+<h2>ملحمة وطن... وتاريخ أمة</h2>
+<p>الأول من نوفمبر 1954</p>
+</div>
+<div class="history">
+في الأول من نوفمبر سنة 1954، انطلقت الثورة التحريرية الجزائرية لتعلن بداية ملحمة تاريخية عظيمة، خاضها الشعب الجزائري دفاعاً عن الحرية والكرامة والاستقلال. بقيت تضحيات الشهداء والمجاهدين منارة للأجيال وذكرى خالدة في تاريخ الجزائر.
+</div>
+</section>
+
+<section class="section" id="upload">
+<div class="heading">
+<h2>منصة المساهمة والتوثيق</h2>
+<p>شاركنا ذكريات الثورة من خلال الصور والفيديوهات</p>
+</div>
+
+<div class="upload-grid">
+
+<div class="upload-card">
+<div class="upload-icon">🎬</div>
+<h3>رفع الفيديوهات</h3>
+<p>انشر فيديوهاتك التوثيقية لتظهر لجميع الزوار.</p>
+<form id="videoForm">
+<div class="field">
+<label for="videoTitle">عنوان الفيديو</label>
+<input id="videoTitle" maxlength="150" required placeholder="عنوان الفيديو">
+</div>
+<div class="field">
+<label for="videoAuthor">اسم الناشر</label>
+<input id="videoAuthor" maxlength="60" required placeholder="اسمك">
+</div>
+<div class="field">
+<label for="videoFile">اختر الفيديو من جهازك</label>
+<input class="file-input" id="videoFile" type="file" accept="video/*,.mp4,.mov,.webm,.3gp,.m4v" required>
+<div class="file-info" id="videoFileInfo">لم يتم اختيار أي فيديو بعد.</div>
+</div>
+<button class="publish" id="videoButton" type="submit">نشر الفيديو 🚀</button>
+<div class="progress" id="videoProgress"><div class="progress-bar" id="videoProgressBar"></div></div>
+<div class="status" id="videoStatus"></div>
+</form>
+</div>
+
+<div class="upload-card">
+<div class="upload-icon">🖼️</div>
+<h3>رفع الصور</h3>
+<p>شارك صوراً تاريخية ووثائقية لتبقى جزءاً من ذاكرة الوطن.</p>
+<form id="imageForm">
+<div class="field">
+<label for="imageTitle">عنوان الصورة</label>
+<input id="imageTitle" maxlength="150" required placeholder="عنوان الصورة">
+</div>
+<div class="field">
+<label for="imageAuthor">اسم الناشر</label>
+<input id="imageAuthor" maxlength="60" required placeholder="اسمك">
+</div>
+<div class="field">
+<label for="imageFile">اختر الصورة من جهازك</label>
+<input class="file-input" id="imageFile" type="file" accept="image/*,.jpg,.jpeg,.png,.webp" required>
+<div class="file-info" id="imageFileInfo">لم يتم اختيار أي صورة بعد.</div>
+</div>
+<button class="publish" id="imageButton" type="submit">نشر الصورة 🚀</button>
+<div class="progress" id="imageProgress"><div class="progress-bar" id="imageProgressBar"></div></div>
+<div class="status" id="imageStatus"></div>
+</form>
+</div>
+
+</div>
+</section>
+
+<section class="gallery-section" id="videos">
+<div class="section">
+<div class="heading"><h2>معرض الفيديوهات التوثيقية</h2><p>الفيديوهات التي شاركها الزوار</p></div>
+<div class="gallery" id="videoGallery"><div class="empty">جاري تحميل الفيديوهات...</div></div>
+</div>
+</section>
+
+<section class="section" id="photos">
+<div class="heading"><h2>معرض الصور التاريخية</h2><p>صور تحفظ ذاكرة الوطن</p></div>
+<div class="gallery" id="imageGallery"><div class="empty">جاري تحميل الصور...</div></div>
+</div>
+</section>
+
+<div class="viewer" id="viewer">
+<button class="close-viewer" id="closeViewer">إغلاق ✕</button>
+<img id="viewerImage" alt="صورة مكبرة">
+</div>
+
+<footer>
+<h2>تحيا الجزائر 🇩🇿</h2>
+<p>المجد والخلود لشهدائنا الأبرار</p>
+<strong>ثانوية بن قاسم شاطو</strong>
+<p>ذاكرة الثورة الجزائرية - 1954 / 1962</p>
+</footer>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://uyvpfojfgpuxuhjiffut.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_OrKJXYiYr7-2R3oC9_jgvg_srqlLgCH'; 
+const BUCKET = 'media'; // تم ضبط اسم الـ Bucket ليتوافق مع الإعدادات السابقة
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+
+function showStatus(id, message, type) {
+    const el = $(id);
+    if(el) {
+        el.textContent = message;
+        el.className = 'status ' + type;
+    }
+}
+
+function showProgress(prefix, value, visible = true) {
+    const prog = $(prefix + 'Progress');
+    const bar = $(prefix + 'ProgressBar');
+    if(prog && bar) {
+        prog.style.display = visible ? 'block' : 'none';
+        bar.style.width = value + '%';
+    }
+}
+
+function setupFilePicker(inputId, infoId) {
+    const input = $(inputId);
+    const info = $(infoId);
+    if (input && info) {
+        input.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) {
+                info.textContent = 'لم يتم اختيار أي ملف.';
+                return;
+            }
+            info.innerHTML = `✅ تم اختيار الملف: <strong style="color:var(--gold);">${file.name}</strong><br>الحجم: ${(file.size / (1024*1024)).toFixed(2)} MB`;
+        });
+    }
+}
+setupFilePicker('videoFile', 'videoFileInfo');
+setupFilePicker('imageFile', 'imageFileInfo');
+
+async function loadGallery() {
+    const vg = $('videoGallery');
+    const ig = $('imageGallery');
+    if(!vg || !ig) return;
+
+    try {
+        const { data, error } = await supabase.from('media').select('*').order('id', { ascending: false });
+        if (error) throw error;
+
+        vg.innerHTML = '<div class="empty">لا توجد فيديوهات منشورة حالياً.</div>';
+        ig.innerHTML = '<div class="empty">لا توجد صور منشورة حالياً.</div>';
+
+        if (!data || data.length === 0) return;
+
+        let hasVideos = false;
+        let hasImages = false;
+
+        for (const item of data) {
+            const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(item.file_path);
+            const fileUrl = publicURLData.publicUrl;
+
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            let mediaEl;
+            if (item.media_type === 'video') {
+                hasVideos = true;
+                mediaEl = document.createElement('video');
+                mediaEl.controls = true;
+                mediaEl.src = fileUrl;
+            } else {
+                hasImages = true;
+                mediaEl = document.createElement('img');
+                mediaEl.src = fileUrl;
+                mediaEl.alt = item.title;
+                mediaEl.addEventListener('click', () => {
+                    const viewerImg = $('viewerImage');
+                    const viewer = $('viewer');
+                    if(viewerImg && viewer) {
+                        viewerImg.src = fileUrl;
+                        viewer.style.display = 'flex';
+                    }
+                });
+            }
+
+            const info = document.createElement('div');
+            info.className = 'card-info';
+            info.innerHTML = `<h3>${item.title}</h3><small>نشر بواسطة: ${item.uploader}</small>`;
+            
+            card.append(mediaEl, info);
+
+            if (item.media_type === 'video') {
+                if (vg.querySelector('.empty')) vg.innerHTML = '';
+                vg.appendChild(card);
+            } else {
+                if (ig.querySelector('.empty')) ig.innerHTML = '';
+                ig.appendChild(card);
+            }
+        }
+    } catch (err) {
+        console.error('Error loading gallery:', err);
+    }
+}
+
+function handlePublish(config) {
+    const form = $(config.form);
+    if(!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titleInput = $(config.title);
+        const authorInput = $(config.author);
+        const fileInput = $(config.file);
+        const btn = $(config.button);
+
+        const title = titleInput ? titleInput.value.trim() : '';
+        const author = authorInput ? authorInput.value.trim() : '';
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+        if (!file) {
+            showStatus(config.status, 'يرجى اختيار ملف من الجهاز أولاً.', 'error');
+            return;
+        }
+
+        if(btn) {
+            btn.disabled = true;
+            btn.textContent = 'جاري النشر...';
+        }
+        showProgress(config.prefix, 30);
+        showStatus(config.status, 'جاري رفع الملف إلى السحاب...', 'info');
+
+        try {
+            const fileExt = file.name.split('.').pop() || 'jpg';
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${config.type}s/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
+            if (uploadError) throw uploadError;
+
+            showProgress(config.prefix, 80);
+            showStatus(config.status, 'جاري حفظ البيانات...', 'info');
+
+            const { error: dbError } = await supabase.from('media').insert([{
+                title: title,
+                media_type: config.type,
+                file_path: filePath,
+                uploader: author
+            }]);
+
+            if (dbError) throw dbError;
+
+            showProgress(config.prefix, 100);
+            showStatus(config.status, 'تم النشر بنجاح وتحديث المعرض!', 'success');
+            
+            form.reset();
+            const infoEl = $(config.info);
+            if(infoEl) infoEl.textContent = 'لم يتم اختيار أي ملف بعد.';
+            await loadGallery();
+
+        } catch (err) {
+            console.error(err);
+            showStatus(config.status, 'حدث خطأ أثناء النشر: ' + (err.message || 'خطأ غير معروف'), 'error');
+        } finally {
+            if(btn) {
+                btn.disabled = false;
+                btn.textContent = config.type === 'video' ? 'نشر الفيديو 🚀' : 'نشر الصورة 🚀';
+            }
+            setTimeout(() => showProgress(config.prefix, 0, false), 2000);
+        }
+    });
+}
+
+handlePublish({
+    form: 'videoForm', title: 'videoTitle', author: 'videoAuthor',
+    file: 'videoFile', info: 'videoFileInfo', button: 'videoButton',
+    status: 'videoStatus', prefix: 'video', type: 'video'
+});
+
+handlePublish({
+    form: 'imageForm', title: 'imageTitle', author: 'imageAuthor',
+    file: 'imageFile', info: 'imageFileInfo', button: 'imageButton',
+    status: 'imageStatus', prefix: 'image', type: 'image'
+});
+
+const closeViewerBtn = $('closeViewer');
+const viewerModal = $('viewer');
+if(closeViewerBtn && viewerModal) {
+    closeViewerBtn.addEventListener('click', () => viewerModal.style.display = 'none');
+    viewerModal.addEventListener('click', (e) => { if (e.target.id === 'viewer') viewerModal.style.display = 'none'; });
+}
+
+loadGallery();
+</script>
+</body>
+</html>
