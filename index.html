@@ -213,116 +213,68 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = id => document.getElementById(id);
 
-// حدود الملفات
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
-const VIDEO_TYPES = [
-    'video/mp4',
-    'video/webm',
-    'video/quicktime',
-    'video/3gpp',
-    'video/x-m4v'
-];
+const VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/3gpp', 'video/x-m4v'];
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-const IMAGE_TYPES = [
-    'image/jpeg',
-    'image/png',
-    'image/webp'
-];
-
-// عرض الرسائل
 function showStatus(id, message, type) {
     const el = $(id);
     if (!el) return;
-
     el.textContent = message;
     el.className = 'status ' + type;
 }
 
-// شريط التقدم
 function showProgress(prefix, value, visible = true) {
     const progress = $(prefix + 'Progress');
     const bar = $(prefix + 'ProgressBar');
-
     if (!progress || !bar) return;
-
     progress.style.display = visible ? 'block' : 'none';
     bar.style.width = value + '%';
 }
 
-// اختيار الملفات
 function setupFilePicker(inputId, infoId) {
     const input = $(inputId);
     const info = $(infoId);
-
     if (!input || !info) return;
 
     input.addEventListener('change', () => {
         const file = input.files?.[0];
-
         if (!file) {
             info.textContent = 'لم يتم اختيار أي ملف.';
             return;
         }
-
-        info.textContent =
-            'تم اختيار الملف: ' + file.name +
-            ' | الحجم: ' +
-            (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        info.textContent = 'تم اختيار الملف: ' + file.name + ' | الحجم: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB';
     });
 }
 
 setupFilePicker('videoFile', 'videoFileInfo');
 setupFilePicker('imageFile', 'imageFileInfo');
 
-// التحقق من الملفات
 function validateFile(file, type) {
-
-    if (!file) {
-        throw new Error('يرجى اختيار ملف أولاً.');
-    }
-
+    if (!file) throw new Error('يرجى اختيار ملف أولاً.');
     if (type === 'video') {
-
-        if (!VIDEO_TYPES.includes(file.type)) {
-            throw new Error('صيغة الفيديو غير مدعومة. استخدم MP4 أو WebM أو MOV.');
-        }
-
-        if (file.size > MAX_VIDEO_SIZE) {
-            throw new Error('حجم الفيديو يتجاوز الحد المسموح (100 MB).');
-        }
-
+        if (!VIDEO_TYPES.includes(file.type)) throw new Error('صيغة الفيديو غير مدعومة. استخدم MP4 أو WebM أو MOV.');
+        if (file.size > MAX_VIDEO_SIZE) throw new Error('حجم الفيديو يتجاوز الحد المسموح (100 MB).');
     } else {
-
-        if (!IMAGE_TYPES.includes(file.type)) {
-            throw new Error('صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WebP.');
-        }
-
-        if (file.size > MAX_IMAGE_SIZE) {
-            throw new Error('حجم الصورة يتجاوز الحد المسموح (10 MB).');
-        }
+        if (!IMAGE_TYPES.includes(file.type)) throw new Error('صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WebP.');
+        if (file.size > MAX_IMAGE_SIZE) throw new Error('حجم الصورة يتجاوز الحد المسموح (10 MB).');
     }
 }
 
-// إنشاء بطاقة آمنة
 function createCard(item, fileUrl) {
-
     const card = document.createElement('article');
     card.className = 'card';
 
     let media;
-
     if (item.media_type === 'video') {
-
         media = document.createElement('video');
         media.controls = true;
         media.preload = 'metadata';
         media.playsInline = true;
         media.src = fileUrl;
-
     } else {
-
         media = document.createElement('img');
         media.src = fileUrl;
         media.alt = item.title || 'صورة تاريخية';
@@ -349,9 +301,8 @@ function createCard(item, fileUrl) {
     return card;
 }
 
-// تحميل المعارض
+// دالة تحميل المعارض المحسنة والمحمية ضد الأخطاء
 async function loadGallery() {
-
     const vg = $('videoGallery');
     const ig = $('imageGallery');
 
@@ -361,10 +312,9 @@ async function loadGallery() {
     ig.innerHTML = '<div class="empty">جاري تحميل الصور...</div>';
 
     try {
-
         const { data, error } = await supabase
             .from('media')
-            .select('id,title,media_type,file_path,uploader')
+            .select('*')
             .order('id', { ascending: false });
 
         if (error) throw error;
@@ -382,26 +332,21 @@ async function loadGallery() {
         let imageCount = 0;
 
         for (const item of data) {
-
             if (!item.file_path) continue;
-
-            if (
-                item.media_type !== 'video' &&
-                item.media_type !== 'image'
-            ) continue;
 
             const { data: urlData } = supabase.storage
                 .from(BUCKET)
                 .getPublicUrl(item.file_path);
 
-            if (!urlData?.publicUrl) continue;
+            const fileUrl = urlData?.publicUrl;
+            if (!fileUrl) continue;
 
-            const card = createCard(item, urlData.publicUrl);
+            const card = createCard(item, fileUrl);
 
             if (item.media_type === 'video') {
                 vg.appendChild(card);
                 videoCount++;
-            } else {
+            } else if (item.media_type === 'image') {
                 ig.appendChild(card);
                 imageCount++;
             }
@@ -416,39 +361,28 @@ async function loadGallery() {
         }
 
     } catch (error) {
-
-        console.error('Gallery error:', error);
-
-        vg.innerHTML = '<div class="empty">تعذر تحميل الفيديوهات. يرجى تحديث الصفحة.</div>';
-        ig.innerHTML = '<div class="empty">تعذر تحميل الصور. يرجى تحديث الصفحة.</div>';
+        console.error('Gallery error details:', error);
+        vg.innerHTML = '<div class="empty">تعذر تحميل الفيديوهات. تأكد من إعدادات قاعدة البيانات.</div>';
+        ig.innerHTML = '<div class="empty">تعذر تحميل الصور. تأكد من إعدادات قاعدة البيانات.</div>';
     }
 }
 
-// رفع الملفات ونشرها
 function handlePublish(config) {
-
     const form = $(config.form);
-
     if (!form) return;
 
     form.addEventListener('submit', async (e) => {
-
         e.preventDefault();
 
         const title = $(config.title).value.trim();
         const author = $(config.author).value.trim();
         const file = $(config.file).files?.[0];
-
         const btn = $(config.button);
 
         let uploadedPath = null;
 
         try {
-
-            if (!title || !author) {
-                throw new Error('يرجى إدخال العنوان واسم الناشر.');
-            }
-
+            if (!title || !author) throw new Error('يرجى إدخال العنوان واسم الناشر.');
             validateFile(file, config.type);
 
             btn.disabled = true;
@@ -458,20 +392,14 @@ function handlePublish(config) {
             showStatus(config.status, 'جاري تجهيز الملف...', 'info');
 
             const extension = file.name.split('.').pop().toLowerCase();
-
-            const randomName = (
-                typeof crypto.randomUUID === 'function'
-                    ? crypto.randomUUID()
-                    : Date.now() + '-' + Math.random().toString(36).slice(2)
-            );
-
-            // اسم آمن ومسار فريد
-            uploadedPath = config.type + '/' + randomName + '.' + extension;
+            const randomName = (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+            
+            // رفع الملف مباشرة في مسار آمن داخل الـ Bucket
+            uploadedPath = randomName + '.' + extension;
 
             showProgress(config.prefix, 30);
             showStatus(config.status, 'جاري رفع الملف إلى التخزين السحابي...', 'info');
 
-            // رفع الملف
             const { error: uploadError } = await supabase
                 .storage
                 .from(BUCKET)
@@ -486,7 +414,6 @@ function handlePublish(config) {
             showProgress(config.prefix, 75);
             showStatus(config.status, 'تم رفع الملف. جاري حفظ بياناته...', 'info');
 
-            // حفظ بيانات الملف في قاعدة البيانات
             const { error: dbError } = await supabase
                 .from('media')
                 .insert([{
@@ -499,63 +426,28 @@ function handlePublish(config) {
             if (dbError) throw dbError;
 
             showProgress(config.prefix, 100);
-
-            showStatus(
-                config.status,
-                'تم النشر بنجاح! أصبح المحتوى متاحاً لجميع الزوار.',
-                'success'
-            );
+            showStatus(config.status, 'تم النشر بنجاح! أصبح المحتوى متاحاً لجميع الزوار.', 'success');
 
             form.reset();
-
             const info = $(config.info);
-            if (info) {
-                info.textContent = 'لم يتم اختيار أي ملف بعد.';
-            }
+            if (info) info.textContent = 'لم يتم اختيار أي ملف بعد.';
 
-            // تحديث المعارض
             await loadGallery();
 
         } catch (error) {
-
             console.error('Publish error:', error);
-
-            // حذف الملف إذا فشل حفظ بياناته
             if (uploadedPath) {
-
-                const { error: deleteError } = await supabase
-                    .storage
-                    .from(BUCKET)
-                    .remove([uploadedPath]);
-
-                if (deleteError) {
-                    console.error('Cleanup error:', deleteError);
-                }
+                await supabase.storage.from(BUCKET).remove([uploadedPath]);
             }
-
-            showStatus(
-                config.status,
-                'فشل النشر: ' + (error.message || 'خطأ غير معروف'),
-                'error'
-            );
-
+            showStatus(config.status, 'فشل النشر: ' + (error.message || 'خطأ غير معروف'), 'error');
         } finally {
-
             btn.disabled = false;
-
-            btn.textContent =
-                config.type === 'video'
-                    ? 'نشر الفيديو 🚀'
-                    : 'نشر الصورة 🚀';
-
-            setTimeout(() => {
-                showProgress(config.prefix, 0, false);
-            }, 2000);
+            btn.textContent = config.type === 'video' ? 'نشر الفيديو 🚀' : 'نشر الصورة 🚀';
+            setTimeout(() => showProgress(config.prefix, 0, false), 2000);
         }
     });
 }
 
-// إعداد رفع الفيديوهات
 handlePublish({
     form: 'videoForm',
     title: 'videoTitle',
@@ -568,7 +460,6 @@ handlePublish({
     type: 'video'
 });
 
-// إعداد رفع الصور
 handlePublish({
     form: 'imageForm',
     title: 'imageTitle',
@@ -581,19 +472,16 @@ handlePublish({
     type: 'image'
 });
 
-// إغلاق عارض الصور
 const closeViewerBtn = $('closeViewer');
 const viewer = $('viewer');
 
 if (closeViewerBtn && viewer) {
-
     closeViewerBtn.addEventListener('click', () => {
         viewer.style.display = 'none';
         $('viewerImage').src = '';
     });
 
     viewer.addEventListener('click', (e) => {
-
         if (e.target === viewer) {
             viewer.style.display = 'none';
             $('viewerImage').src = '';
@@ -601,7 +489,6 @@ if (closeViewerBtn && viewer) {
     });
 }
 
-// تشغيل الموقع
 loadGallery();
 </script>
 </body>
