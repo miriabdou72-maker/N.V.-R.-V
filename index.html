@@ -333,7 +333,7 @@ function handlePublish(config) {
 
         try {
             const fileExt = file.name.split('.').pop() || 'jpg';
-            // تعديل مسار الحفظ ليتوافق مع مجلدات images/ و videos/
+            // التعديل الأساسي: الحفظ التلقائي داخل مجلدات images أو videos ليطابق قاعدة البيانات
             const filePath = `${config.type}s/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
             const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
