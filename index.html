@@ -260,13 +260,8 @@ async function loadGallery() {
         if (!data || data.length === 0) return;
 
         for (const item of data) {
-            // معالجة ذكية تضمن جلب المسار بشكل صحيح سواء كان بمجلد أو بدونه
-            let realPath = item.file_path;
-            if (realPath && !realPath.includes('/')) {
-                realPath = `${item.media_type}s/${realPath}`;
-            }
-
-            const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(realPath);
+            // جلب الرابط مباشرة بناءً على مسار الملف المخزنين في قاعدة البيانات
+            const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(item.file_path);
             const fileUrl = publicURLData.publicUrl;
 
             const card = document.createElement('article');
@@ -339,7 +334,8 @@ function handlePublish(config) {
 
         try {
             const fileExt = file.name.split('.').pop() || 'jpg';
-            const filePath = `${config.type}s/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            // حفظ الملف مباشرة في الجذر الرئيسي للـ Bucket بدون مجلدات ليتطابق مع ما يظهر في لوحة التحكم
+            const filePath = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
             const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
             if (uploadError) throw uploadError;
