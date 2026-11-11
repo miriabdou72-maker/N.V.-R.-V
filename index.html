@@ -260,7 +260,13 @@ async function loadGallery() {
         if (!data || data.length === 0) return;
 
         for (const item of data) {
-            const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(item.file_path);
+            // معالجة ذكية تضمن جلب المسار بشكل صحيح سواء كان بمجلد أو بدونه
+            let realPath = item.file_path;
+            if (realPath && !realPath.includes('/')) {
+                realPath = `${item.media_type}s/${realPath}`;
+            }
+
+            const { data: publicURLData } = supabase.storage.from(BUCKET).getPublicUrl(realPath);
             const fileUrl = publicURLData.publicUrl;
 
             const card = document.createElement('article');
@@ -333,7 +339,6 @@ function handlePublish(config) {
 
         try {
             const fileExt = file.name.split('.').pop() || 'jpg';
-            // التعديل الأساسي: الحفظ التلقائي داخل مجلدات images أو videos ليطابق قاعدة البيانات
             const filePath = `${config.type}s/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
             const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file);
